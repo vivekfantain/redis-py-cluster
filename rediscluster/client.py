@@ -737,21 +737,7 @@ class StrictRedisCluster(StrictRedis):
         if src == dst:
             raise ResponseError("source and destination objects are the same")
 
-        data = self.dump(src)
-
-        if data is None:
-            raise ResponseError("no such key")
-
-        ttl = self.pttl(src)
-
-        if ttl is None or ttl < 1:
-            ttl = 0
-
-        self.delete(dst)
-        self.restore(dst, ttl, data)
-        self.delete(src)
-
-        return True
+        return self.execute_command('RENAME', src, dst)
 
     def delete(self, *names):
         """
